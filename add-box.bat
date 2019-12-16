@@ -1,0 +1,1 @@
+vagrant box add .\hyperv.box --name windows-2019-sql-2019 --force

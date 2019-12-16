@@ -1,0 +1,1 @@
+packer build -force -only hyperv-iso .\template.json

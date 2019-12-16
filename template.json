@@ -1,0 +1,62 @@
+{
+  "variables": {
+	"switch_name": "External",
+    "iso_url": "17763.737.190906-2324.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us_1.iso",
+    "iso_checksum": "70fec2cb1d6759108820130c2b5496da"
+  },
+  "builders": [
+    {
+      "type": "hyperv-iso",
+      "guest_additions_mode": "disable",
+      "iso_url": "{{ user `iso_url` }}",
+      "iso_checksum": "{{ user `iso_checksum` }}",
+	  "cpus": 4,
+      "memory": 4096,
+      "communicator": "winrm",
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_timeout": "12h",
+      "shutdown_command": "C:/Windows/Panther/Unattend/PackerShutdown.bat",
+      "shutdown_timeout": "15m",
+      "switch_name": "{{ user `switch_name` }}",
+      "floppy_files": [
+        "Autounattend.xml",
+        "scripts/winrm.ps1"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "scripts/PackerShutdown.bat",
+      "destination": "C:/Windows/Panther/Unattend/"
+    },
+    {
+      "type": "file",
+      "source": "scripts/unattend.xml",
+      "destination": "C:/Windows/Panther/Unattend/"
+    },
+    {
+      "type": "powershell",
+      "script": "scripts/chocolatey.ps1",
+      "elevated_user": "vagrant",
+      "elevated_password": "vagrant"
+    },
+    {
+      "type": "powershell",
+      "inline": [
+        "choco install googlechrome -y",
+        "choco install notepadplusplus.install -y"
+      ],
+      "elevated_user": "vagrant",
+      "elevated_password": "vagrant"
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "keep_input_artifact": true,
+      "output": "{{.Provider}}.box"
+    }
+  ]
+}
